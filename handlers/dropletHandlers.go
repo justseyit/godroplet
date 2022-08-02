@@ -30,7 +30,7 @@ func CreateNewDroplet(createRequest *godo.DropletCreateRequest) (godo.Droplet, g
 	return *droplet, *response, err
 }
 
-func ListAllDroplets(options *godo.ListOptions) ([]godo.Image, godo.Response, error) {
+func ListAllDroplets(options *godo.ListOptions) ([]godo.Droplet, godo.Response, error) {
 
 	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
 	ctx := context.TODO()
@@ -42,9 +42,11 @@ func ListAllDroplets(options *godo.ListOptions) ([]godo.Image, godo.Response, er
 		return droplets, err
 	}*/
 
-	snapshot, response, err := client.Droplets.Snapshots(ctx, 3164494, options)
+	droplets, response, err := client.Droplets.List(ctx, options)
 
-	return snapshot, *response, err
+	//snapshot, response, err := client.Droplets.Snapshots(ctx, 3164494, options)
+
+	return droplets, *response, err
 
 }
 
