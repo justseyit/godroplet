@@ -1,3 +1,3 @@
 package constants
 
-var DIGITALOCEAN_TOKEN string = "dop_v1_a31decc527a83370e8dab00991cb841f5821ebff869c0048fd8159c245ce4b7f"
+const DIGITALOCEAN_TOKEN string = "dop_v1_d45f3a179c20bc9d7297bdc79dc46a05d781fa503edf63cb91ab270c699109a1"
