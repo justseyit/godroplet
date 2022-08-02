@@ -1,5 +1,3 @@
 package constants
 
-import "os"
-
-var DIGITALOCEAN_TOKEN string = os.Getenv("DIGITALOCEAN_TOKEN")
+var DIGITALOCEAN_TOKEN string = "dop_v1_a31decc527a83370e8dab00991cb841f5821ebff869c0048fd8159c245ce4b7f"
