@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"godroplet/constants"
+	"godroplet/utils"
 
 	"github.com/digitalocean/godo"
 )
@@ -20,13 +21,14 @@ SSHKeys: []godo.DropletCreateSSHKey{
 IPv6: true,
 Tags: []string{"web"},}*/
 
-func CreateNewDroplet(createRequest *godo.DropletCreateRequest) (godo.Droplet, godo.Response, error) {
+func CreateNewDroplet(createRequest godo.DropletCreateRequest) (godo.Droplet, godo.Response, error) {
 
 	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
 	ctx := context.TODO()
 
-	droplet, response, err := client.Droplets.Create(ctx, createRequest)
+	droplet, response, err := client.Droplets.Create(ctx, &createRequest)
 
+	utils.CheckError(err)
 	return *droplet, *response, err
 }
 

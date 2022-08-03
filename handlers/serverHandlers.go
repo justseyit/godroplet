@@ -37,22 +37,21 @@ func GetDropletsHandler(w http.ResponseWriter, r *http.Request) {
 
 //HTTP Handler for creating a droplet
 func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
-	err := r.ParseForm()
-	utils.CheckError(err)
+	vars := mux.Vars(r)
 
 	//Get the form values
-	name := r.FormValue("name")
-	size := r.FormValue("size")
-	image := r.FormValue("image")
-	region := r.FormValue("region")
-	sshKey, _ := strconv.Atoi(r.FormValue("ssh_key"))
-	backups, _ := strconv.ParseBool(r.FormValue("backups"))
-	ipv6, _ := strconv.ParseBool(r.FormValue("ipv6"))
-	privateNetworking, _ := strconv.ParseBool(r.FormValue("private_networking"))
-	userData := r.FormValue("user_data")
+	name := vars["name"]
+	size := vars["size"]
+	image := vars["image"]
+	region := vars["region"]
+	sshKey, _ := strconv.Atoi(vars["ssh_key"])
+	backups, _ := strconv.ParseBool(vars["backups"])
+	ipv6, _ := strconv.ParseBool(vars["ipv6"])
+	privateNetworking, _ := strconv.ParseBool(vars["private_networking"])
+	userData := vars["user_data"]
 
 	//Create the droplet
-	createRequest := &godo.DropletCreateRequest{
+	createRequest := godo.DropletCreateRequest{
 		Name:   name,
 		Region: region,
 		Size:   size,

@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	mux := mux.NewRouter()
+	mux := mux.NewRouter().StrictSlash(true)
 	mux.HandleFunc("/newdroplet", PostDropletHandler)
 	mux.HandleFunc("/droplets", GetDropletsHandler)
 	mux.HandleFunc("/droplets/{dropletID}", GetDropletHandler)
