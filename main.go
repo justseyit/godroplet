@@ -15,6 +15,11 @@ func main() {
 	mux.HandleFunc("/droplets/{dropletID}/actions", GetDropletActionsHandler)
 	mux.HandleFunc("/delete/{dropletID}", DeleteDropletHandler)
 	mux.HandleFunc("/backups/{dropletID}", GetBackupsHandler)
+	mux.HandleFunc("/", HomeHandler)
 
 	http.ListenAndServe(":9000", mux)
+}
+
+func HomeHandler(w http.ResponseWriter, r *http.Request) {
+	w.Write([]byte("Hello World!"))
 }
