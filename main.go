@@ -9,8 +9,9 @@ import (
 
 func main() {
 	mux := mux.NewRouter().StrictSlash(true)
-	mux.HandleFunc("/newdroplet", PostDropletHandler).Methods("POST")
 	mux.HandleFunc("/droplets", GetDropletsHandler).Methods("GET")
+	mux.HandleFunc("/droplets/single", PostDropletHandler).Methods("POST")
+	mux.HandleFunc("/droplets/multiple", PostDropletsHandler).Methods("POST")
 	mux.HandleFunc("/droplets/{dropletID}", GetDropletHandler).Methods("GET")
 	mux.HandleFunc("/droplets/{dropletID}", DeleteDropletHandler).Methods("DELETE")
 	mux.HandleFunc("/droplets/{dropletID}/actions", GetDropletActionsHandler).Methods("GET")

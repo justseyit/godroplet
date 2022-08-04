@@ -12,7 +12,7 @@ import (
 	"github.com/gorilla/mux"
 )
 
-//HTTP Handler for getting a droplet by droplet id
+// HTTP Handler for getting a droplet by droplet id
 func GetDropletHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -25,7 +25,7 @@ func GetDropletHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(droplet.String()))
 }
 
-//HTTP Handler for getting all droplets
+// HTTP Handler for getting all droplets
 func GetDropletsHandler(w http.ResponseWriter, r *http.Request) {
 	options := godo.ListOptions{}
 	droplets, _, err := ListAllDroplets(&options)
@@ -38,7 +38,7 @@ func GetDropletsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//HTTP Handler for creating a droplet
+// HTTP Handler for creating a droplet
 func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
 
 	var createRequest godo.DropletCreateRequest
@@ -47,45 +47,18 @@ func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
 	err := decoder.Decode(&createRequest)
 	utils.CheckErrorAsResponse(err, w)
 
-	/*vars := mux.Vars(r)
-
-	//Get the form values
-	name := vars["name"]
-	size := vars["size"]
-	image := vars["image"]
-	region := vars["region"]
-	sshKey, _ := strconv.Atoi(vars["ssh_key"])
-	backups, _ := strconv.ParseBool(vars["backups"])
-	ipv6, _ := strconv.ParseBool(vars["ipv6"])
-	privateNetworking, _ := strconv.ParseBool(vars["private_networking"])
-	userData := vars["user_data"]
-
-	//Create the droplet
-	createRequest := godo.DropletCreateRequest{
-		Name:   name,
-		Region: region,
-		Size:   size,
-		Image: godo.DropletCreateImage{
-			Slug: image,
-		},
-		SSHKeys: []godo.DropletCreateSSHKey{
-			{ID: sshKey},
-		},
-		Backups:           backups,
-		IPv6:              ipv6,
-		PrivateNetworking: privateNetworking,
-		UserData:          userData,}*/
 	fmt.Println(createRequest)
 
 	droplet, _, err := CreateNewDroplet(createRequest)
-	utils.CheckError(err)
+	utils.CheckErrorAsResponse(err, w)
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(droplet.String()))
+	data, _ := json.Marshal(droplet)
+	w.Write([]byte(data))
 }
 
-//HTTP Handler for getting a droplet's actions by droplet id
+// HTTP Handler for getting a droplet's actions by droplet id
 func GetDropletActionsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -101,7 +74,26 @@ func GetDropletActionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//HTTP Handler for deleting a droplet by droplet id
+// HTTP Handler for create multiple droplets
+func PostDropletsHandler(w http.ResponseWriter, r *http.Request) {
+	var createRequest godo.DropletMultiCreateRequest
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&createRequest)
+	utils.CheckErrorAsResponse(err, w)
+
+	fmt.Println(createRequest)
+
+	droplets, _, err := CreateNewDroplets(createRequest)
+	utils.CheckErrorAsResponse(err, w)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+	data, _ := json.Marshal(droplets)
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for deleting a droplet by droplet id
 func DeleteDropletHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -113,7 +105,7 @@ func DeleteDropletHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-//HTTP Handler for getting a droplet's backups by droplet id
+// HTTP Handler for getting a droplet's backups by droplet id
 func GetBackupsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -129,7 +121,7 @@ func GetBackupsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-//HTTP Handler for initiate an action by droplet id
+// HTTP Handler for initiate an action by droplet id
 func PostDropletActionHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
