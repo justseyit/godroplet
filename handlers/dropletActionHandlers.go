@@ -171,6 +171,17 @@ func EnableIPv6ByDropletID(dropletID int) (godo.Action, godo.Response, error) {
 	return *action, *response, err
 }
 
+//Disable IPv6 for a Droplet (Have not an endpoint.)
+/*func DisableIPv6ByDropletID(dropletID int) (godo.Action, godo.Response, error) {
+
+	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
+	ctx := context.TODO()
+
+	action, response, err := client.DropletActions.DisableIPv6(ctx, dropletID)
+
+	return *action, *response, err
+}*/
+
 //Enable Private Networking for a Droplet
 func EnablePrivateNetworkingByDropletID(dropletID int) (godo.Action, godo.Response, error) {
 
@@ -181,6 +192,17 @@ func EnablePrivateNetworkingByDropletID(dropletID int) (godo.Action, godo.Respon
 
 	return *action, *response, err
 }
+
+//Disable Private Networking for a Droplet (Have not an endpoint.)
+/*func DisablePrivateNetworkingByDropletID(dropletID int) (godo.Action, godo.Response, error) {
+
+	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
+	ctx := context.TODO()
+
+	action, response, err := client.DropletActions.DisablePrivateNetworking(ctx, dropletID)
+
+	return *action, *response, err
+}*/
 
 //Snapshot a Droplet
 func SnapshotByDropletID(dropletID int, name string) (godo.Action, godo.Response, error) {

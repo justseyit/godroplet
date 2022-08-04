@@ -1,6 +1,9 @@
 package handlers
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
 	"godroplet/utils"
 	"net/http"
 	"strconv"
@@ -37,7 +40,14 @@ func GetDropletsHandler(w http.ResponseWriter, r *http.Request) {
 
 //HTTP Handler for creating a droplet
 func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
-	vars := mux.Vars(r)
+
+	var createRequest godo.DropletCreateRequest
+
+	decoder := json.NewDecoder(r.Body)
+	err := decoder.Decode(&createRequest)
+	utils.CheckErrorAsResponse(err, w)
+
+	/*vars := mux.Vars(r)
 
 	//Get the form values
 	name := vars["name"]
@@ -64,8 +74,8 @@ func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
 		Backups:           backups,
 		IPv6:              ipv6,
 		PrivateNetworking: privateNetworking,
-		UserData:          userData,
-	}
+		UserData:          userData,}*/
+	fmt.Println(createRequest)
 
 	droplet, _, err := CreateNewDroplet(createRequest)
 	utils.CheckError(err)
@@ -75,6 +85,7 @@ func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(droplet.String()))
 }
 
+//HTTP Handler for getting a droplet's actions by droplet id
 func GetDropletActionsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -90,6 +101,7 @@ func GetDropletActionsHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+//HTTP Handler for deleting a droplet by droplet id
 func DeleteDropletHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -101,6 +113,7 @@ func DeleteDropletHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
+//HTTP Handler for getting a droplet's backups by droplet id
 func GetBackupsHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
@@ -113,5 +126,191 @@ func GetBackupsHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(http.StatusOK)
 	for _, backup := range backups {
 		w.Write([]byte(backup.String()))
+	}
+}
+
+//HTTP Handler for initiate an action by droplet id
+func PostDropletActionHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	actionStr := vars["action"]
+	fmt.Println(vars)
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+
+	switch actionStr {
+	case "power_cycle":
+		action, response, err := PowerCycleByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "power_off":
+		action, response, err := PowerOffByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "power_on":
+		action, response, err := PowerOnByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "reboot":
+		action, response, err := RebootByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "shutdown":
+		action, response, err := ShutdownByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "snapshot":
+		var name string
+		err := r.ParseForm()
+		name = r.FormValue("name")
+		utils.CheckErrorAsResponse(err, w)
+
+		action, response, err := SnapshotByDropletID(dropletIDInt, name)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "restore":
+		var imageID int
+		err := r.ParseForm()
+		imageID, _ = strconv.Atoi(r.FormValue("image_id"))
+		utils.CheckErrorAsResponse(err, w)
+
+		action, response, err := RestoreByDropletID(dropletIDInt, imageID)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "password_reset":
+		action, response, err := PasswordResetByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "rebuild":
+		var imageSlug string
+		err := r.ParseForm()
+		imageSlug = r.FormValue("image_slug")
+		utils.CheckErrorAsResponse(err, w)
+
+		action, response, err := RebuildByDropletID(dropletIDInt, imageSlug)
+		utils.CheckErrorAsResponse(err, w)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "resize":
+		var size string
+		var val bool
+		err := r.ParseForm()
+		size = r.FormValue("size")
+		val, _ = strconv.ParseBool(r.FormValue("val"))
+		utils.CheckErrorAsResponse(err, w)
+
+		action, response, err := ResizeByDropletID(dropletIDInt, size, val)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "rename":
+		var name string
+		err := r.ParseForm()
+		name = r.FormValue("name")
+		utils.CheckErrorAsResponse(err, w)
+		//Get name value from form
+
+		action, response, err := RenameByDropletID(dropletIDInt, name)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "change_kernel":
+		var kernelID int
+		err := r.ParseForm()
+		kernelID, _ = strconv.Atoi(r.FormValue("kernel_id"))
+		utils.CheckErrorAsResponse(err, w)
+
+		action, response, err := ChangeKernelByDropletID(dropletIDInt, kernelID)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "enable_ipv6":
+		action, response, err := EnableIPv6ByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	/*case "disable_ipv6":
+	action, response, err := DisableIPv6ByDropletID(dropletIDInt)
+	break*/
+	case "enable_private_networking":
+		action, response, err := EnablePrivateNetworkingByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	/*case "disable_private_networking":
+	_, err := DisablePrivateNetworkingDropletByID(dropletIDInt)
+	break*/
+	case "enable_backups":
+		action, response, err := EnableBackupsByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "disable_backups":
+		action, response, err := DisableBackupsByDropletID(dropletIDInt)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	default:
+		err := errors.New("Invalid action")
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		break
 	}
 }
