@@ -32,6 +32,17 @@ func CreateNewDroplet(createRequest godo.DropletCreateRequest) (godo.Droplet, go
 	return *droplet, *response, err
 }
 
+func CreateNewDroplets(createRequest godo.DropletMultiCreateRequest) ([]godo.Droplet, godo.Response, error) {
+
+	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
+	ctx := context.TODO()
+
+	droplets, response, err := client.Droplets.CreateMultiple(ctx, &createRequest)
+
+	utils.CheckError(err)
+	return droplets, *response, err
+}
+
 func ListAllDroplets(options *godo.ListOptions) ([]godo.Droplet, godo.Response, error) {
 
 	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
