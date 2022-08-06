@@ -1,7 +1,6 @@
-package handlers
+package services
 
 import (
-	"context"
 	"godroplet/constants"
 	"godroplet/utils"
 
@@ -23,8 +22,8 @@ Tags: []string{"web"},}*/
 
 func CreateNewDroplet(createRequest godo.DropletCreateRequest) (godo.Droplet, godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	droplet, response, err := client.Droplets.Create(ctx, &createRequest)
 
@@ -34,8 +33,8 @@ func CreateNewDroplet(createRequest godo.DropletCreateRequest) (godo.Droplet, go
 
 func CreateNewDroplets(createRequest godo.DropletMultiCreateRequest) ([]godo.Droplet, godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	droplets, response, err := client.Droplets.CreateMultiple(ctx, &createRequest)
 
@@ -45,8 +44,8 @@ func CreateNewDroplets(createRequest godo.DropletMultiCreateRequest) ([]godo.Dro
 
 func ListAllDroplets(options *godo.ListOptions) ([]godo.Droplet, godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	/*droplets, _, err := client.Droplets.List(ctx, &godo.ListOptions{})
 	if err != nil {
@@ -65,8 +64,8 @@ func ListAllDroplets(options *godo.ListOptions) ([]godo.Droplet, godo.Response, 
 
 func DeleteDropletByTag(tag string) (godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	response, err := client.Droplets.DeleteByTag(ctx, tag)
 
@@ -79,8 +78,8 @@ func DeleteDropletByTag(tag string) (godo.Response, error) {
 
 func GetDropletByID(id int) (godo.Droplet, godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	droplet, response, err := client.Droplets.Get(ctx, id)
 
@@ -89,8 +88,8 @@ func GetDropletByID(id int) (godo.Droplet, godo.Response, error) {
 
 func DeleteDropletByID(id int) (godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	response, err := client.Droplets.Delete(ctx, id)
 	if err != nil {
@@ -102,8 +101,8 @@ func DeleteDropletByID(id int) (godo.Response, error) {
 
 func GetBackupsByDropletID(id int, options *godo.ListOptions) ([]godo.Image, godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	backups, response, err := client.Droplets.Backups(ctx, id, options)
 
@@ -112,8 +111,8 @@ func GetBackupsByDropletID(id int, options *godo.ListOptions) ([]godo.Image, god
 
 func GetsSnapshotsByDropletID(id int, options *godo.ListOptions) (godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	_, response, err := client.Droplets.Snapshots(ctx, id, options)
 	if err != nil {
@@ -125,8 +124,8 @@ func GetsSnapshotsByDropletID(id int, options *godo.ListOptions) (godo.Response,
 
 func GetAvailableKernelsByDropletID(id int, options *godo.ListOptions) (godo.Response, error) {
 
-	client := godo.NewFromToken(constants.DIGITALOCEAN_TOKEN)
-	ctx := context.TODO()
+	client := constants.CLIENT
+	ctx := constants.CTX
 
 	_, response, err := client.Droplets.Kernels(ctx, id, options)
 	if err != nil {

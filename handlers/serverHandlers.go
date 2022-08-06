@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	. "godroplet/services"
 	"godroplet/utils"
 	"net/http"
 	"strconv"
@@ -305,4 +306,89 @@ func PostDropletActionHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		break
 	}
+}
+
+// HTTP Handler for initiate an action by tags
+func PostDropletActionHandlerByTags(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	tag := vars["tag"]
+	actionStr := vars["action"]
+
+	switch actionStr {
+	case "snapshot":
+		var name string
+		err := r.ParseForm()
+		name = r.FormValue("name")
+		utils.CheckErrorAsResponse(err, w)
+		action, response, err := SnapshotByTag(tag, name)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "shutdown":
+		action, response, err := ShutdownByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "power_off":
+		action, response, err := PowerOffByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "power_on":
+		action, response, err := PowerOnByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "power_cycle":
+		action, response, err := PowerCycleByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "enable_ipv6":
+		action, response, err := EnableIPv6ByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "enable_backups":
+		action, response, err := EnableBackupsByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	case "disable_backups":
+		action, response, err := DisableBackupsByTag(tag)
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(response.StatusCode)
+		data, _ := json.Marshal(action)
+		w.Write([]byte(data))
+		break
+	default:
+		err := errors.New("Invalid action")
+		utils.CheckErrorAsResponse(err, w)
+		w.Header().Set("Content-Type", "application/json")
+		w.WriteHeader(http.StatusBadRequest)
+		break
+	}
+
 }
