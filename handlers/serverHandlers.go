@@ -29,14 +29,14 @@ func GetDropletHandler(w http.ResponseWriter, r *http.Request) {
 // HTTP Handler for getting all droplets
 func GetDropletsHandler(w http.ResponseWriter, r *http.Request) {
 	options := godo.ListOptions{}
-	droplets, _, err := ListAllDroplets(&options)
+	droplets, response, err := ListAllDroplets(&options)
 	utils.CheckError(err)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	for _, droplet := range droplets {
-		w.Write([]byte(droplet.String()))
-	}
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(droplets)
+	w.Write([]byte(data))
 }
 
 // HTTP Handler for creating a droplet
@@ -50,11 +50,11 @@ func PostDropletHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(createRequest)
 
-	droplet, _, err := CreateNewDroplet(createRequest)
+	droplet, response, err := CreateNewDroplet(createRequest)
 	utils.CheckErrorAsResponse(err, w)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(response.StatusCode)
 	data, _ := json.Marshal(droplet)
 	w.Write([]byte(data))
 }
@@ -65,14 +65,14 @@ func GetDropletActionsHandler(w http.ResponseWriter, r *http.Request) {
 	dropletID := vars["dropletID"]
 	dropletIDInt, _ := strconv.Atoi(dropletID)
 	options := godo.ListOptions{}
-	actions, _, err := GetActionsByDropletID(dropletIDInt, options)
+	actions, response, err := GetActionsByDropletID(dropletIDInt, options)
 	utils.CheckError(err)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	for _, action := range actions {
-		w.Write([]byte(action.String()))
-	}
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(actions)
+	w.Write([]byte(data))
 }
 
 // HTTP Handler for create multiple droplets
@@ -85,11 +85,11 @@ func PostDropletsHandler(w http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(createRequest)
 
-	droplets, _, err := CreateNewDroplets(createRequest)
+	droplets, response, err := CreateNewDroplets(createRequest)
 	utils.CheckErrorAsResponse(err, w)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(response.StatusCode)
 	data, _ := json.Marshal(droplets)
 	w.Write([]byte(data))
 }
@@ -99,11 +99,22 @@ func DeleteDropletHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dropletID := vars["dropletID"]
 	dropletIDInt, _ := strconv.Atoi(dropletID)
-	_, err := DeleteDropletByID(dropletIDInt)
+	response, err := DeleteDropletByID(dropletIDInt)
 	utils.CheckError(err)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
+	w.WriteHeader(response.StatusCode)
+}
+
+// HTTP Handler for deleting droplets by tag
+func DeleteDropletByTagHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	tag := vars["tag"]
+	response, err := DeleteDropletsByTag(tag)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
 }
 
 // HTTP Handler for getting a droplet's backups by droplet id
@@ -112,14 +123,46 @@ func GetBackupsHandler(w http.ResponseWriter, r *http.Request) {
 	dropletID := vars["dropletID"]
 	dropletIDInt, _ := strconv.Atoi(dropletID)
 	options := godo.ListOptions{}
-	backups, _, err := GetBackupsByDropletID(dropletIDInt, &options)
+	backups, response, err := GetBackupsByDropletID(dropletIDInt, &options)
 	utils.CheckError(err)
 
 	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	for _, backup := range backups {
-		w.Write([]byte(backup.String()))
-	}
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(backups)
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for getting a droplet's kernels by droplet id
+func GetDropletKernelsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+	options := godo.ListOptions{}
+	kernels, response, err := GetAvailableKernelsByDropletID(dropletIDInt, &options)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(kernels)
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for getting a droplet's snapshots by droplet id
+func GetDropletSnapshotsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+	options := godo.ListOptions{}
+	snapshots, response, err := GetsSnapshotsByDropletID(dropletIDInt, &options)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(snapshots)
+	w.Write([]byte(data))
 }
 
 // HTTP Handler for initiate an action by droplet id
@@ -309,7 +352,7 @@ func PostDropletActionHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 // HTTP Handler for initiate an action by tags
-func PostDropletActionHandlerByTags(w http.ResponseWriter, r *http.Request) {
+func PostDropletActionByTagHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	tag := vars["tag"]
 	actionStr := vars["action"]
