@@ -2,6 +2,9 @@ package services
 
 import (
 	"godroplet/constants"
+	"godroplet/utils"
+	"net/http"
+	"strconv"
 
 	"github.com/digitalocean/godo"
 )
@@ -310,4 +313,22 @@ func SnapshotByTag(tag string, name string) ([]godo.Action, godo.Response, error
 
 	action, response, err := client.DropletActions.SnapshotByTag(ctx, tag, name)
 	return action, *response, err
+}
+
+// *********************************************************************************************
+// Retrieve a Droplet Action by Droplet ID and Action ID
+func RetrieveByDropletIDAndActionID(dropletID int, actionID int) (http.Response, error) {
+
+	//client := constants.CLIENT
+	ctx := constants.CTX
+
+	req, err := http.Get(constants.URL + "/droplets/" + strconv.Itoa(dropletID) + "/actions/" + strconv.Itoa(actionID))
+
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	utils.CheckError(err)
+
+	response, err := godo.DoRequest(ctx, req.Request)
+
+	return *response, err
 }

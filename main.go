@@ -22,12 +22,17 @@ func main() {
 	mux.HandleFunc("/droplets/{dropletID}/actions/{action}", PostDropletActionHandler).Methods("POST")
 	mux.HandleFunc("/droplets/{tag}/actions/{action}", PostDropletActionByTagHandler).Methods("POST")
 	mux.HandleFunc("/droplets/{dropletID}/snapshots", GetDropletSnapshotsHandler).Methods("GET")
-	mux.HandleFunc("/droplets/{dropletID}/kernels/", GetDropletKernelsHandler).Methods("GET")
+	mux.HandleFunc("/droplets/{dropletID}/kernels", GetDropletKernelsHandler).Methods("GET")
+	mux.HandleFunc("/droplets/{dropletID}/resources", GetDropletResourcesHandler).Methods("GET")
+	mux.HandleFunc("/droplets/{dropletID}/neighbors", GetDropletNeighborsHandler).Methods("GET")
+	mux.HandleFunc("/droplets/{dropletID}/firewalls", GetFirewallsHandler).Methods("GET")
 	mux.HandleFunc("/", HomeHandler)
+	mux.HandleFunc("/introduction", HomeHandler)
 
 	http.ListenAndServe(":9000", mux)
 }
 
+// HTTP Handler for the introduction page
 func HomeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("Hello World!"))
 }

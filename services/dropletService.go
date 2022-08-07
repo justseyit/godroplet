@@ -1,8 +1,13 @@
 package services
 
 import (
+	"encoding/json"
 	"godroplet/constants"
 	"godroplet/utils"
+	"io/ioutil"
+	"net/http"
+	"strconv"
+	"strings"
 
 	"github.com/digitalocean/godo"
 )
@@ -132,7 +137,6 @@ func GetAvailableKernelsByDropletID(id int, options *godo.ListOptions) ([]godo.K
 	return kernels, *response, err
 }
 
-// /****************************************************************************************************///
 func GetNeighborsByDropletID(id int, options *godo.ListOptions) ([]godo.Droplet, godo.Response, error) {
 
 	client := constants.CLIENT
@@ -153,16 +157,104 @@ func GetAppliedFirewallsByDropletID(id int, options *godo.ListOptions) ([]godo.F
 	return firewalls, *response, err
 }
 
-/*
-func GetAssociatedResourcesByDropletID(id int, options *godo.ListOptions) (godo.Response, error) {
+// /****************************************************************************************************///
 
-	client := constants.CLIENT
+// Get associated resources by droplet ID
+func GetAssociatedResourcesByDropletID(id int, options *godo.ListOptions) (http.Response, error) {
+
+	//client := constants.CLIENT
 	ctx := constants.CTX
 
+	req, err := http.Get(constants.URL + "/droplets/" + string(rune(id)) + "/destroy_with_associated_resources")
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	utils.CheckError(err)
 
-	req, err := http.NewRequest("GET", "https://api.digitalocean.com/v2/droplets/"+string(id)+"/resources", nil)
+	response, err := godo.DoRequest(ctx, req.Request)
+
+	return *response, err
+}
+
+// Selectively delete droplet with associated resources by droplet ID
+func SelectivelyDeleteDropletWithAssociatedResourcesByID(id int, data string) (http.Response, error) {
+
+	jsonData, _ := json.Marshal(data)
+
+	//client := constants.CLIENT
+	ctx := constants.CTX
+
+	req, err := http.NewRequest("DELETE", constants.URL+"/droplets/"+string(rune(id))+"/destroy_with_associated_resources/selective", nil)
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	req.Body = ioutil.NopCloser(strings.NewReader(string(jsonData)))
+	utils.CheckError(err)
 
 	response, err := godo.DoRequest(ctx, req)
 
-	return  *response, err
-}*/
+	return *response, err
+}
+
+// Destroy a Droplet and All of its Associated Resources (Dangerous)
+func DestroyDropletWithAssociatedResourcesByID(id int, alert bool) (http.Response, error) {
+
+	//client := constants.CLIENT
+	ctx := constants.CTX
+
+	req, err := http.NewRequest("DELETE", constants.URL+"/droplets/"+string(rune(id))+"/destroy_with_associated_resources/dangerous", nil)
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("X-Dangerous", strconv.FormatBool(alert))
+	utils.CheckError(err)
+
+	response, err := godo.DoRequest(ctx, req)
+
+	return *response, err
+}
+
+// Check Status of a Droplet Destroy with Associated Resources Request
+func CheckStatusOfDropletDestroyRequest(id int) (http.Response, error) {
+
+	//client := constants.CLIENT
+	ctx := constants.CTX
+
+	req, err := http.NewRequest("GET", constants.URL+"/droplets/"+string(rune(id))+"/destroy_with_associated_resources/status", nil)
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	utils.CheckError(err)
+
+	response, err := godo.DoRequest(ctx, req)
+
+	return *response, err
+}
+
+// Retry a Droplet Destroy with Associated Resources Request
+func RetryDropletDestroyRequest(id int) (http.Response, error) {
+
+	//client := constants.CLIENT
+	ctx := constants.CTX
+
+	req, err := http.NewRequest("POST", constants.URL+"/droplets/"+string(rune(id))+"/destroy_with_associated_resources/retry", nil)
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	utils.CheckError(err)
+
+	response, err := godo.DoRequest(ctx, req)
+
+	return *response, err
+}
+
+// List All Droplet Neighbors
+func GetAllDropletNeighborsIDs() (http.Response, error) {
+
+	//client := constants.CLIENT
+	ctx := constants.CTX
+
+	req, err := http.NewRequest("GET", constants.URL+"/reports/droplet_neighbors_ids", nil)
+	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
+	req.Header.Set("Content-Type", "application/json")
+	utils.CheckError(err)
+
+	response, err := godo.DoRequest(ctx, req)
+
+	return *response, err
+}

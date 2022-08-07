@@ -165,6 +165,54 @@ func GetDropletSnapshotsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(data))
 }
 
+// HTTP Handler for getting a droplet's neighbors by droplet id
+func GetDropletNeighborsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+	options := godo.ListOptions{}
+	neighbors, response, err := GetNeighborsByDropletID(dropletIDInt, &options)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(neighbors)
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for getting associated resources by droplet id
+func GetDropletResourcesHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+	options := godo.ListOptions{}
+	response, err := GetAssociatedResourcesByDropletID(dropletIDInt, &options)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(response.Body)
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for getting firewalls applied to a droplet by droplet id
+func GetFirewallsHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+	options := godo.ListOptions{}
+	firewalls, response, err := GetAppliedFirewallsByDropletID(dropletIDInt, &options)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(firewalls)
+	w.Write([]byte(data))
+}
+
 // HTTP Handler for initiate an action by droplet id
 func PostDropletActionHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
@@ -433,5 +481,4 @@ func PostDropletActionByTagHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusBadRequest)
 		break
 	}
-
 }
