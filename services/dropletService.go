@@ -247,12 +247,12 @@ func GetAllDropletNeighborsIDs() (http.Response, error) {
 	//client := constants.CLIENT
 	ctx := constants.CTX
 
-	req, err := http.NewRequest("GET", constants.URL+"/reports/droplet_neighbors_ids", nil)
+	req, err := http.Get(constants.URL + "/reports/droplet_neighbors_ids")
 	req.Header.Set("Authorization", "Bearer "+constants.DIGITALOCEAN_TOKEN)
 	req.Header.Set("Content-Type", "application/json")
 	utils.CheckError(err)
 
-	response, err := godo.DoRequest(ctx, req)
+	response, err := godo.DoRequest(ctx, req.Request)
 
 	return *response, err
 }

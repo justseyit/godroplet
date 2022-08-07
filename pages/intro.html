@@ -1,0 +1,33 @@
+<h1 id="godroplet">godroplet</h1>
+<h2 id="en">[EN]</h2>
+<p>This tool has allows you to use Digital Ocean Droplet and Droplet Actions API.</p>
+<h2 id="http-get-methods">HTTP GET Methods</h2>
+<ul>
+<li><code>/droplets</code>: Get all droplets.</li>
+<li><code>/droplets/{dropletID}</code>: Get droplet by id. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/actions</code>: Get all actions of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/backups</code>: Get all backups of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/snapshots</code>: Get all snapshots of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/kernels</code>: Get all kernels of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/resources</code>: Get all resources of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/neighbors</code>: Get all neighbors of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/firewalls</code>: Get all firewalls of a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/neighbors</code>: Get all droplet ID lists that co-located on the same physical hardware.</li>
+<li><code>/droplets/{dropletID}/resources/status</code>: Check status of a droplet destroy with associated resources request by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/{dropletID}/actions/{actionID}</code>: Get an action on a droplet by droplet ID and action ID. Replace <code>{dropletID}</code> with droplet ID and <code>{actionID}</code> with action ID.</li>
+</ul>
+<h2 id="http-post-methods">HTTP POST Methods</h2>
+<ul>
+<li><code>/droplets/single</code>: Create a droplet. In the request body, you need to specify droplet properties as JSON. You can find the properties in <a href="https://docs.digitalocean.com/reference/api/api-reference/#operation/droplets_create">this part of Digital Ocean Documentation</a>.</li>
+<li><code>/droplets/multiple</code>: Create multiple droplets. In the request body, you need to specify droplet properties as JSON. You can find the properties in <a href="https://docs.digitalocean.com/reference/api/api-reference/#operation/droplets_create">this part of Digital Ocean Documentation</a>.</li>
+<li><code>/droplets/{dropletID}/actions/{action}</code>: Perform an action on a droplet by droplet ID and action. Replace <code>{dropletID}</code> with droplet ID and <code>{action}</code> with action. You can find the actions in <a href="https://docs.digitalocean.com/reference/api/api-reference/#operation/dropletActions_post">this part of Digital Ocean Documentation</a>.</li>
+<li><code>/droplets/tags/{tag}/actions/{action}</code>: Perform an action on a droplet by tag and action. Replace <code>{tag}</code> with tag and <code>{action}</code> with action. You can find the actions in <a href="https://docs.digitalocean.com/reference/api/api-reference/#operation/dropletActions_post_byTag">this part of Digital Ocean Documentation</a>.</li>
+<li><code>/droplets/{dropletID}/resources/retry</code>: Retry a &quot;Droplet Destroy with Associated Resources Request&quot; by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+</ul>
+<h2 id="http-delete-methods">HTTP DELETE Methods</h2>
+<ul>
+<li><code>/droplets/{dropletID}</code>: Delete a droplet by droplet ID. Replace <code>{dropletID}</code> with droplet ID.</li>
+<li><code>/droplets/tags/{tag}</code>: Delete a droplet by tag. Replace <code>{tag}</code> with tag.</li>
+<li><code>/droplets/{dropletID}/resources/selective</code>: Delete a droplet by droplet ID and delete associated resources selectively. Replace <code>{dropletID}</code> with droplet ID. You should specify the resources you want to delete in the request body as JSON. You can find the request body schema in <a href="https://docs.digitalocean.com/reference/api/api-reference/#operation/droplets_destroy_withAssociatedResourcesSelective">this part of Digital Ocean Documentation</a>.</li>
+<li><code>/droplets/{dropletID}/resources/dangerous</code>: Delete a droplet by droplet ID and delete all of associated resources. Replace <code>{dropletID}</code> with droplet ID. You have to specify the boolean value as string &quot;true&quot; or &quot;false&quot; in the request header. You can find the request header parameters in <a href="https://docs.digitalocean.com/reference/api/api-reference/#operation/droplets_destroy_withAssociatedResourcesDangerous">this part of Digital Ocean Documentation</a>.</li>
+</ul>
