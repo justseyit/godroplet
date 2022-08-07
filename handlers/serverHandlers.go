@@ -213,6 +213,107 @@ func GetFirewallsHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(data))
 }
 
+// HTTP Handler for deleting a droplet with associated resources selectively
+func DeleteDropletWithResourcesSelectivelyHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+
+	decoder := json.NewDecoder(r.Body)
+
+	var data string
+
+	decoder.Decode(&data)
+
+	response, err := SelectivelyDeleteDropletWithAssociatedResourcesByID(dropletIDInt, data)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+}
+
+// HTTP Handler for deleting a droplet with associated resources dangerous
+func DeleteDropletWithResourcesDangerousHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+
+	alertStr := r.Header.Get("alert")
+	alert, err := strconv.ParseBool(alertStr)
+	utils.CheckErrorAsResponse(err, w)
+
+	response, err := DestroyDropletWithAssociatedResourcesByID(dropletIDInt, alert)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+}
+
+// HTTP Handler for getting a droplet's neighbor id list
+func GetDropletNeighborIDsHandler(w http.ResponseWriter, r *http.Request) {
+
+	response, err := GetAllDropletNeighborsIDs()
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(response.Body)
+
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for Check Status of a Droplet Destroy with Associated Resources Request
+func CheckDropletDestroyStatusHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+
+	response, err := CheckStatusOfDropletDestroyRequest(dropletIDInt)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(response.Body)
+
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for Retry a Droplet Destroy with Associated Resources Request
+func RetryDropletDestroyRequestHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+
+	response, err := RetryDropletDestroyRequest(dropletIDInt)
+	utils.CheckError(err)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(response.Body)
+
+	w.Write([]byte(data))
+}
+
+// HTTP Handler for getting a droplet's action by droplet id and action id
+func GetDropletActionByActionIDHandler(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	dropletID := vars["dropletID"]
+	dropletIDInt, _ := strconv.Atoi(dropletID)
+	actionID := vars["actionID"]
+	actionIDInt, _ := strconv.Atoi(actionID)
+	response, err := RetrieveByDropletIDAndActionID(dropletIDInt, actionIDInt)
+	utils.CheckErrorAsResponse(err, w)
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(response.StatusCode)
+
+	data, _ := json.Marshal(response.Body)
+	w.Write([]byte(data))
+}
+
 // HTTP Handler for initiate an action by droplet id
 func PostDropletActionHandler(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)

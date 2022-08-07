@@ -315,7 +315,6 @@ func SnapshotByTag(tag string, name string) ([]godo.Action, godo.Response, error
 	return action, *response, err
 }
 
-// *********************************************************************************************
 // Retrieve a Droplet Action by Droplet ID and Action ID
 func RetrieveByDropletIDAndActionID(dropletID int, actionID int) (http.Response, error) {
 

@@ -157,8 +157,6 @@ func GetAppliedFirewallsByDropletID(id int, options *godo.ListOptions) ([]godo.F
 	return firewalls, *response, err
 }
 
-// /****************************************************************************************************///
-
 // Get associated resources by droplet ID
 func GetAssociatedResourcesByDropletID(id int, options *godo.ListOptions) (http.Response, error) {
 
